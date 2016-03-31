@@ -22,12 +22,14 @@ import jackson.champ.yandexmusic.Utils.OnTaskCompleted;
 
 public class ArtistsList extends android.support.v4.app.Fragment implements OnTaskCompleted {
 
-    String url = "http://cache-default04d.cdn.yandex.net/download.cdn.yandex.net/mobilization-2016/artists.json";
+    private static final String TAG = "ArtistsList";
+    String url = "http://download.cdn.yandex.net/mobilization-2016/artists.json";
     private static ArrayList<Artist> sArtists = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private AdapterMain adapter;
     private LinearLayoutManager sLinearLayoutManager;
     private CheckBox fav;
+
 
 
     @Nullable

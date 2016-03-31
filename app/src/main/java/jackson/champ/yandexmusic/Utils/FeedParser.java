@@ -4,16 +4,12 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,8 +17,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.apache.commons.io.IOUtils.copy;
 
 /**
  * Created by jackson on 29.03.16.
@@ -42,11 +36,31 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
         this.onTaskCompleted = onTaskCompleted;
     }
 
-    @Override
+    private void enableHttpResponseCache() {
+        try {
+            long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+            File httpCacheDir = new File(activity.getCacheDir(), "http");
+            Class.forName("android.net.http.HttpResponseCache")
+                    .getMethod("install", File.class, long.class)
+                    .invoke(null, httpCacheDir, httpCacheSize);
+            Log.d(TAG, "CACHEDIR: " + activity.getCacheDir());
+        } catch (Exception httpResponseCacheNotAvailable) {
+            Log.d(TAG, "HTTP response cache is unavailable.");
+
+        }
+    }
+
+
+        @Override
     protected JSONObject doInBackground(URL... params) {
         try {
-
+            //обработчик плохой связи сделать
             HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            conn.setUseCaches(true);
+            conn.setDefaultUseCaches(true);
+            enableHttpResponseCache();
             InputStream input = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(input, "UTF-8"));
             reader.beginArray();
@@ -56,9 +70,9 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
                     Log.d(TAG, "doInBackground: WAS HERE");
                     Log.d(TAG, "doInBackground: " + message.getImgUrl().getSmall());
             }
-//
-//            reader.endArray();
-//            reader.close();
+
+            reader.endArray();
+            reader.close();
 
 //            HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
 //            InputStream input = conn.getInputStream();
@@ -86,6 +100,7 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
 
         } catch (IOException jse) {
             jse.printStackTrace();
+            //выводить сообщения как в дроидере
         }
         return jsonRoot;
     }
@@ -93,28 +108,5 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         onTaskCompleted.onTaskCompleted();
-//        for (int i = 0; i < mArtists.size(); i++) {
-//            Artist feedItem = new Artist();
-//
-//            feedItem.setArtistName(mArtistName.get(i));
-//            feedItem.setGenre(mGenres.get(i));
-//            feedItem.setArtistAlbums(mArtistAlbums.get(i));
-//            feedItem.setArtistTracks(mArtistTracks.get(i));
-//            mArtists.add(feedItem);
-////        }
-////    }
     }
-
-        //    @Override
-//    protected void onPostExecute(Void aVoid) {
-//        for (int i = 0; i < mArtistName.size(); i++) {
-//            Artist feedItem = new Artist();
-//
-//            feedItem.setArtistName(mArtistName.get(i));
-//            feedItem.setGenre(mGenres.get(i));
-//            feedItem.setArtistAlbums(mArtistAlbums.get(i));
-//            feedItem.setArtistTracks(mArtistTracks.get(i));
-//            mArtists.add(feedItem);
-//    }
-// }
 }

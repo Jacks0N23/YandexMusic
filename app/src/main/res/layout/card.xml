@@ -24,13 +24,14 @@
         <ImageView
             android:id="@+id/artist_image"
             android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
             tools:ignore="ContentDescription"
             android:layout_gravity="center_horizontal"
-            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/fav"
+            android:layout_alignParentTop="true" />
 
         <LinearLayout
             android:id="@+id/footer"
@@ -48,25 +49,30 @@
                 android:id="@+id/artist_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="bottom|start"
+                android:gravity="start"
                 android:includeFontPadding="false"
-                android:typeface="serif"
-                android:textColor="?android:attr/textColorTertiary"
+                android:typeface="normal"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="24sp"
                 tools:text="Title!"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp" />
+                android:textIsSelectable="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="-10dp" />
 
             <TextView
                 android:id="@+id/genre"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:background="?android:attr/colorBackground"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textColor="?android:attr/textColorTertiary"
                 android:textSize="14sp"
                 tools:text="genre!"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp" />
+                android:layout_margin="10dp"
+                android:typeface="serif" />
 
         </LinearLayout>
 
@@ -89,12 +95,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/colorBackground"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="?android:attr/textColorTertiary"
                     android:textSize="14sp"
                     tools:text="albums!"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:layout_column="0" />
+                    android:layout_column="0"
+                    android:typeface="monospace" />
 
             </TableRow>
 
@@ -112,12 +119,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="?android:attr/colorBackground"
-                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColor="?android:attr/textColorTertiary"
                         android:textSize="14sp"
                         tools:text="tracks!"
                         android:layout_column="0"
                         android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp" />
+                        android:layout_marginRight="10dp"
+                        android:typeface="monospace" />
                 </TableRow>
             </TableRow>
 
@@ -127,12 +135,11 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/fav"
-            android:background="@color/cardview_light_background"
             android:button="@drawable/ic_unchecked_fav"
             android:layout_below="@+id/footer"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:checked="false" />
+            android:gravity="start" />
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
