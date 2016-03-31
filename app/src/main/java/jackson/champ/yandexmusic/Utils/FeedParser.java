@@ -6,8 +6,12 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -27,11 +31,6 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
 
     private Activity activity;
     private List<Artist> mArtists = new ArrayList<>();
-    private List<String> mArtistImage = new ArrayList<>();
-    private List<String> mArtistName = new ArrayList<>();
-    private List<String> mGenres = new ArrayList<>();
-    private List<String> mArtistAlbums = new ArrayList<>();
-    private List<String> mArtistTracks = new ArrayList<>();
     private String TAG = "FeedParser";
     private JSONObject jsonRoot;
 
@@ -46,21 +45,20 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
     @Override
     protected JSONObject doInBackground(URL... params) {
         try {
+
             HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
             InputStream input = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(input, "UTF-8"));
             reader.beginArray();
             while (reader.hasNext()) {
-                Artist message = new Gson().fromJson(reader, Artist.class);
-                message.getArtistName();
-                mArtists.add(message);
-                Log.d(TAG, "doInBackground: WAS HERE");
-                Log.d(TAG, "doInBackground: " + message.getArtistName());
-
+                    Artist message = new GsonBuilder().setLenient().create().fromJson(reader, Artist.class);
+                    mArtists.add(message);
+                    Log.d(TAG, "doInBackground: WAS HERE");
+                    Log.d(TAG, "doInBackground: " + message.getImgUrl().getSmall());
             }
-
-            reader.endArray();
-            reader.close();
+//
+//            reader.endArray();
+//            reader.close();
 
 //            HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
 //            InputStream input = conn.getInputStream();
@@ -68,26 +66,22 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
 //            copy(input, baos);
 //            jsonRoot = new JSONObject(baos.toString());
 
-//            String json = IOUtils.toString(new URL(params[0]));
+//            String json = IOUtils.toString(params[0]);
 //            JsonParser parser = new JsonParser();
 //            JsonElement element = parser.parse(json);
-//            mArtists = new Gson().fromJson(element, ArrayList.class);
-//            Log.d(TAG, "doInBackground: WAS HERE" );
-//            if (element.isJsonObject()) {
-//                JsonObject artistName = element.getAsJsonObject();
-//                mArtistName.add(artistName.get("name").getAsString());
-//                Log.d(TAG, "doInBackground: " + artistName.get("name").getAsString());
-//                JsonObject genres = element.getAsJsonObject();
-//                mGenres.add(artistName.get("genres").getAsString());
+//            Gson gson = new Gson();
 //
-//                JsonObject artistAlbums = element.getAsJsonObject();
-//                mArtistAlbums.add(artistName.get("albums").getAsString());
+//            if (element.getAsJsonObject() == element.getAsJsonObject().getAsJsonObject("cover")) {
+//                Artist.ImageLoader img = gson.fromJson(element, Artist.ImageLoader.class);
+//                mArtistImage.add(img);
+//            }
+//            else
+//            {
+//                Artist artist = new Gson().fromJson(element, Artist.class);
+//                mArtists.add(artist);
+//                Log.d(TAG, "doInBackground: WAS HERE");
+//                Log.d(TAG, "doInBackground: " + artist.getArtistName());
 //
-//                JsonObject artistTracks = element.getAsJsonObject();
-//                mArtistTracks.add(artistName.get("tracks").getAsString());
-
-//                JsonObject artistImage = element.getAsJsonObject();
-//                mArtistImage.add(artistName.get("cover").getAsString());
 //            }
 
         } catch (IOException jse) {
