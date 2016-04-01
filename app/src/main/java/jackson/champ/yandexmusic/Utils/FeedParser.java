@@ -21,13 +21,12 @@ import java.util.List;
 /**
  * Created by jackson on 29.03.16.
  */
-public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
+public class FeedParser extends AsyncTask<URL, Void, Void> {
 
     private Activity activity;
     private List<Artist> mArtists = new ArrayList<>();
     private String TAG = "FeedParser";
-    private JSONObject jsonRoot;
-
+    public static int hash;
     OnTaskCompleted onTaskCompleted;
 
     public FeedParser(Activity activity, OnTaskCompleted onTaskCompleted, ArrayList<Artist> data) {
@@ -52,7 +51,7 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
 
 
         @Override
-    protected JSONObject doInBackground(URL... params) {
+    protected Void doInBackground(URL... params) {
         try {
             //обработчик плохой связи сделать
             HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
@@ -63,6 +62,8 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
             enableHttpResponseCache();
             InputStream input = conn.getInputStream();
             JsonReader reader = new JsonReader(new InputStreamReader(input, "UTF-8"));
+            hash = reader.hashCode();
+            Log.d(TAG, "doInBackground: " + hash);
             reader.beginArray();
             while (reader.hasNext()) {
                     Artist message = new GsonBuilder().setLenient().create().fromJson(reader, Artist.class);
@@ -102,11 +103,11 @@ public class FeedParser extends AsyncTask<URL, Void, JSONObject> {
             jse.printStackTrace();
             //выводить сообщения как в дроидере
         }
-        return jsonRoot;
+        return null;
     }
 
     @Override
-    protected void onPostExecute(JSONObject jsonObject) {
+    protected void onPostExecute(Void obj) {
         onTaskCompleted.onTaskCompleted();
     }
 }
