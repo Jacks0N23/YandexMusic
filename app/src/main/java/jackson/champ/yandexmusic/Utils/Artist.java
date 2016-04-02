@@ -20,9 +20,11 @@ public class Artist {
     @SerializedName("tracks")
     private String mArtistTracks;
     @SerializedName("link")
-    private String mUrl;
+    private String mLink;
     @SerializedName("cover")
     private Imgs mArtistImage;
+    @SerializedName("description")
+    private String mDescription;
 
     public String getArtistName() {
         return mArtistName;
@@ -40,12 +42,12 @@ public class Artist {
         mGenre = ArtistGenre;
     }
 
-    public String getUrl() {
-        return mUrl;
+    public String getLink() {
+        return mLink;
     }
 
-    public void setUrl(String url) {
-        mUrl = url;
+    public void setLink(String url) {
+        mLink = url;
     }
 
     public Imgs getImgUrl() {
@@ -64,4 +66,11 @@ public class Artist {
 
     public void setArtistTracks(String ArtistTracks) { mArtistTracks = ArtistTracks;}
 
+    public String getmDescription() {
+        return mDescription;
+    }
+
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
+    }
 }
