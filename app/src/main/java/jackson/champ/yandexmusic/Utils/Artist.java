@@ -4,6 +4,7 @@ package jackson.champ.yandexmusic.Utils;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Map;
 
 public class Artist {
     private static final String TAG = "Artist";
@@ -22,7 +23,7 @@ public class Artist {
     @SerializedName("link")
     private String mLink;
     @SerializedName("cover")
-    private Imgs mArtistImage;
+    private Map<String, String> mArtistImage;
     @SerializedName("description")
     private String mDescription;
 
@@ -30,47 +31,23 @@ public class Artist {
         return mArtistName;
     }
 
-    public void setArtistName(String ArtistName) {
-        mArtistName = ArtistName;
-    }
-
     public List<String> getGenre() {
         return mGenre;
-    }
-
-    public void setGenre(List<String> ArtistGenre) {
-        mGenre = ArtistGenre;
     }
 
     public String getLink() {
         return mLink;
     }
 
-    public void setLink(String url) {
-        mLink = url;
-    }
-
-    public Imgs getImgUrl() {
+    public Map<String, String> getImgUrl() {
         return mArtistImage;
-    }
-
-    public void setImgUrl(Imgs imgUrl) {
-        mArtistImage = imgUrl;
     }
 
     public String getArtistAlbums() { return  mArtistAlbums; }
 
-    public void setArtistAlbums(String ArtistAlbums) { mArtistAlbums = ArtistAlbums; }
-
     public String getArtistTracks() { return  mArtistTracks; }
 
-    public void setArtistTracks(String ArtistTracks) { mArtistTracks = ArtistTracks;}
-
-    public String getmDescription() {
+    public String getDescription() {
         return mDescription;
-    }
-
-    public void setmDescription(String mDescription) {
-        this.mDescription = mDescription;
     }
 }

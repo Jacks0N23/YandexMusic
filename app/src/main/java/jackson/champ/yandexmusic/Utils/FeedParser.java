@@ -66,7 +66,7 @@ public class FeedParser extends AsyncTask<URL, Void, Void> {
                     Artist message = new GsonBuilder().setLenient().create().fromJson(reader, Artist.class);
                     mArtists.add(message);
                     Log.d(TAG, "doInBackground: WAS HERE");
-                    Log.d(TAG, "doInBackground: " + message.getImgUrl().getSmall());
+                    Log.d(TAG, "doInBackground: " + message.getImgUrl().get("small"));
             }
 
             reader.endArray();

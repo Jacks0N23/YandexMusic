@@ -1,10 +1,13 @@
 package jackson.champ.yandexmusic.MainScreen;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -31,6 +34,7 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     private RecyclerView mRecyclerView;
     private AdapterMain adapter;
     Animation animation;
+    private SharedPreferences sp;
 
 
     @Nullable
@@ -51,19 +55,22 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
             LoadingData();
         }
 
+        sp = getActivity().getSharedPreferences("fav", Context.MODE_MULTI_PROCESS);
+
         return ArtistsList;
     }
 
     private synchronized void LoadingData()
     {
         animation = AnimationUtils.loadAnimation(getActivity(), R.anim.fav_checking);
-                adapter = new AdapterMain(getActivity(), sArtists, animation);
+
+        adapter = new AdapterMain(getActivity(), sArtists, animation);
         mRecyclerView.setAdapter(adapter);
         try {
 
             new FeedParser(getActivity(), this, sArtists).execute(new URL(url));
 
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
 
             e.printStackTrace();
 
@@ -76,4 +83,14 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     public synchronized void onTaskCompleted() {
         adapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "ArtistsList: " + AdapterMain.favSet);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putStringSet("favSet", AdapterMain.favSet);
+        ed.apply();
+        super.onPause();
+    }
+
 }

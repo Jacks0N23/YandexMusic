@@ -1,20 +1,26 @@
 package jackson.champ.yandexmusic.Utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.widget.ImageButton;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import jackson.champ.yandexmusic.ArtistSreen.ArtistDescription;
 import jackson.champ.yandexmusic.R;
@@ -22,30 +28,45 @@ import jackson.champ.yandexmusic.R;
 
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
+    private static final String TAG = "AdapterMain" ;
     public static ArrayList<Artist> data;
     private static Activity activity;
     Animation animation;
+    public static Set<String> favSet = new HashSet<>();
+    private SharedPreferences sp;
+    String[] favArray = {};
+    // boolean array for storing
+    //the state of each CheckBox
+    //без этой хрени они по какому-то закону дублируются
+    boolean[] checkBoxState;
 
 
     public AdapterMain(Activity activity, ArrayList<Artist> data, Animation animation) {
         AdapterMain.activity = activity;
         AdapterMain.data = data;
         this.animation = animation;
+
+
     }
 
     @Override
     public AdapterMain.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card, parent, false);
-
+        Log.d(TAG, "onCreateViewHolder: favSet.size() " + favSet.size());
+        sp = activity.getSharedPreferences("fav", Context.MODE_PRIVATE);
+        favSet = sp.getStringSet("favSet", favSet);
+        favArray = favSet.toArray(new String[favSet.size() + 1 ]);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final AdapterMain.ViewHolder holder, int position) {
+    public void onBindViewHolder(final AdapterMain.ViewHolder holder, final int position) {
 
-
+        checkBoxState = new boolean[data.size()];
+        Log.d(TAG, "Constructor: data.size()  " + data.size());
         final Artist item = data.get(position);
+
         String genres = "";
         final String albums = item.getArtistAlbums() + " " + activity.getString(R.string.albums);
         final String tracks =item.getArtistTracks() + " " + activity.getString(R.string.tracks);
@@ -60,7 +81,20 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         holder.ArtistAlbums.setText(albums);
         holder.ArtistTracks.setText(tracks);
 
-        Glide.with(activity).load(item.getImgUrl().getSmall()).into(holder.ArtistImage);
+        Glide.with(activity).load(item.getImgUrl().get("small")).into(holder.ArtistImage);
+
+        Log.d(TAG, "onBindViewHolder: position " + position);
+
+
+        for(String s : favArray) {
+            if (item.getArtistName().equals(s)) {
+                checkBoxState[position] = true;
+                holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
+            } else {
+                checkBoxState[position] = false;
+                holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
+            }
+        }
 
         final String finalGenres = genres;
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -71,32 +105,57 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 artist.putExtra(Utils.KEY_ARTIST_GENRES, finalGenres);
                 artist.putExtra(Utils.KEY_ARTIST_ALBUMS, albums);
                 artist.putExtra(Utils.KEY_ARTIST_TRACKS, tracks);
-                artist.putExtra(Utils.KEY_ARTIST_DESCRIPTION, item.getmDescription());
+                artist.putExtra(Utils.KEY_ARTIST_DESCRIPTION, item.getDescription());
                 artist.putExtra(Utils.KEY_ARTIST_LINK, item.getLink());
-                artist.putExtra(Utils.KEY_ARTIST_BIG_IMAGE, item.getImgUrl().getBig());
+                artist.putExtra(Utils.KEY_ARTIST_BIG_IMAGE, item.getImgUrl().get("big"));
                 activity.startActivity(artist);
             }
         });
 
-        holder.fav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
 
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked)
-//                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
-//                else
-//                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
 //
-//                buttonView.startAnimation(animation);
-//                buttonView.refreshDrawableState();
+//        holder.fav.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (((CheckBox) v).isChecked()) {
+//                    checkBoxState[position] = true;
+//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_unchecked_fav);
+//                    favSet.remove(data.get(position).getArtistName());
+//                } else {
+//                    checkBoxState[position] = false;
+//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_checked_fav);
+//                    favSet.add(data.get(position).getArtistName());
+//                }
+//                v.startAnimation(animation);
+//                v.refreshDrawableState();
+//                Log.d(TAG, "OnClickListener: " + favSet.size());
 //            }
 //        });
+//
+
+        holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    checkBoxState[position] = true;
+                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
+                    favSet.remove(data.get(position).getArtistName());
+                }
+                else {
+                    checkBoxState[position] = false;
+                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
+                    favSet.add(data.get(position).getArtistName());
+                }
+
+                buttonView.startAnimation(animation);
+                buttonView.refreshDrawableState();
+                Log.d(TAG, "OnClickListener: " + favSet.size());
+            }
+        });
+        holder.fav.setChecked(checkBoxState[position]);
     }
+
 
 
     @Override
@@ -105,9 +164,8 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageButton fav;
+        private CheckBox fav;
         private CardView cardView;
         public ImageView ArtistImage;
         private TextView ArtistName;
@@ -117,7 +175,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
         public ViewHolder(View holderView) {
             super(holderView);
-            fav = (ImageButton) holderView.findViewById(R.id.fav);
+            fav = (CheckBox) holderView.findViewById(R.id.fav);
             cardView = (CardView) holderView.findViewById(R.id.card_view);
             ArtistImage = (ImageView) holderView.findViewById(R.id.artist_image);
             ArtistName = (TextView) holderView.findViewById(R.id.artist_name);

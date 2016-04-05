@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import jackson.champ.yandexmusic.R;
 import jackson.champ.yandexmusic.Utils.Utils;
@@ -58,8 +59,17 @@ public class ArtistDescription extends AppCompatActivity {
 
         extras = getIntent().getExtras();
 
+
+
         Log.d(TAG, "onCreate: " + extras.getString(Utils.KEY_ARTIST_BIG_IMAGE));
-        Glide.with(this).load(extras.getString(Utils.KEY_ARTIST_BIG_IMAGE)).into(ArtistImage);
+        Glide
+             .with(this)
+             .load(extras.getString(Utils.KEY_ARTIST_BIG_IMAGE))
+             .diskCacheStrategy(DiskCacheStrategy.ALL)
+             .fitCenter()
+             .centerCrop()
+             .crossFade()
+             .into(ArtistImage);
         ArtistGenres.setText(extras.getString(Utils.KEY_ARTIST_GENRES));
         ArtistAlbums.setText(extras.getString(Utils.KEY_ARTIST_ALBUMS));
         ArtistTracks.setText(extras.getString(Utils.KEY_ARTIST_TRACKS));
