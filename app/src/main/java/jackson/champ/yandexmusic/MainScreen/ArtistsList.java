@@ -30,7 +30,7 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
 
     private static final String TAG = "ArtistsList";
     String url = "http://download.cdn.yandex.net/mobilization-2016/artists.json";
-    private static ArrayList<Artist> sArtists = new ArrayList<>();
+    public static ArrayList<Artist> sArtists = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private AdapterMain adapter;
     Animation animation;
@@ -55,12 +55,12 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
             LoadingData();
         }
 
-        sp = getActivity().getSharedPreferences("fav", Context.MODE_MULTI_PROCESS);
+        sp = getActivity().getSharedPreferences("fav", Context.MODE_PRIVATE);
 
         return ArtistsList;
     }
 
-    private synchronized void LoadingData()
+    private void LoadingData()
     {
         animation = AnimationUtils.loadAnimation(getActivity(), R.anim.fav_checking);
 
@@ -88,6 +88,7 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     public void onPause() {
         Log.d(TAG, "ArtistsList: " + AdapterMain.favSet);
         SharedPreferences.Editor ed = sp.edit();
+        ed.clear();
         ed.putStringSet("favSet", AdapterMain.favSet);
         ed.apply();
         super.onPause();

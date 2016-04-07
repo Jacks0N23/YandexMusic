@@ -7,13 +7,12 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true"
-    tools:context=".Elements.Article.ArticleActivity">
+    tools:context=".ArtistSreen.ArtistDescription">
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/article_background_NSV"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_vertical"
+            android:layout_height="wrap_content"
             android:fadeScrollbars="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_below="@+id/appbar_article"
@@ -34,7 +33,7 @@
                     android:layout_marginBottom="16dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="16dp"
                     android:textColor="?android:attr/textColorTertiary"
                     android:textSize="16sp"
                     android:hint="genres" />
@@ -99,14 +98,12 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_article"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:fitsSystemWindows="true">
+        android:layout_height="350dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -142,6 +139,7 @@
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    app:titleTextColor="?android:attr/colorBackground"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true" />
