@@ -94,4 +94,8 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
         super.onPause();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 }

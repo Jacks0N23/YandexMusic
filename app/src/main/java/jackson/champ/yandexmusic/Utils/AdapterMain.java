@@ -19,6 +19,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,16 +30,13 @@ import jackson.champ.yandexmusic.R;
 
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
-    private static final String TAG = "AdapterMain" ;
+    private static final String TAG = "AdapterMain";
     public static ArrayList<Artist> data;
     private static Activity activity;
     Animation animation;
-    public static Set<String> favSet = new HashSet<>();
+    public static Set<String> favSet = Collections.synchronizedSet(new HashSet<String>());
     private SharedPreferences sp;
-    String[] favArray = {};
     // boolean array for storing
-    //the state of each CheckBox
-    //без этой хрени они по какому-то закону дублируются
     boolean[] checkBoxState;
 
 
@@ -45,38 +44,36 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         AdapterMain.activity = activity;
         AdapterMain.data = data;
         this.animation = animation;
-
-        checkBoxState = new boolean[317];
-        Log.e(TAG, "onViewAttachedToWindow: " + checkBoxState[0]);
-
+        Log.d(TAG, "Constructor: data.size()  " + data.size());
     }
 
     @Override
     public AdapterMain.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card, parent, false);
-        Log.d(TAG, "onCreateViewHolder: favSet.size() " + favSet.size());
+
         sp = activity.getSharedPreferences("fav", Context.MODE_PRIVATE);
         favSet = sp.getStringSet("favSet", favSet);
-        favArray = favSet.toArray(new String[favSet.size() + 1 ]);
+        Log.d(TAG, "onCreateViewHolder: favSet.size() " + favSet.size());
+        checkBoxState = new boolean[data.size()];
+        Log.e(TAG, "onViewAttachedToWindow: " + checkBoxState.length);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final AdapterMain.ViewHolder holder, final int position) {
 
-        Log.d(TAG, "Constructor: data.size()  " + data.size());
+
         final Artist item = data.get(position);
 
         String genres = "";
         final String albums = item.getArtistAlbums() + " " + activity.getString(R.string.albums);
-        final String tracks =item.getArtistTracks() + " " + activity.getString(R.string.tracks);
+        final String tracks = item.getArtistTracks() + " " + activity.getString(R.string.tracks);
         holder.ArtistName.setText(item.getArtistName());
-        for(int i = 0; i < item.getGenre().size(); i++)
-        {
-            genres+=item.getGenre().get(i);
-            if(i != item.getGenre().size()-1)
-            genres+=", ";
+        for (int i = 0; i < item.getGenre().size(); i++) {
+            genres += item.getGenre().get(i);
+            if (i != item.getGenre().size() - 1)
+                genres += ", ";
         }
         holder.ArtistGenre.setText(genres);
         holder.ArtistAlbums.setText(albums);
@@ -84,82 +81,70 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
         Glide.with(activity).load(item.getImgUrl().get("small")).into(holder.ArtistImage);
 
-            Log.d(TAG, "onBindViewHolder: position " + position);
+        Log.d(TAG, "onBindViewHolder: position " + position);
 
-
-        for (String s : favArray) {
-            if (item.getArtistName().equals(s)) {
-                Log.e(TAG, "onBindViewHolder: " + s);
-                checkBoxState[position] = true;
-                Log.e(TAG, "onBindViewHolder: " + checkBoxState[position]);
-                holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
-                break;
-            } else {
-                checkBoxState[position] = false;
-                holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
+            try {
+                for (String s : favSet) {
+                    if (item.getArtistName().equals(s)) {
+                        Log.e(TAG, "onBindViewHolder: " + s);
+                        checkBoxState[position] = true;
+                        Log.e(TAG, "onBindViewHolder: " + checkBoxState[position]);
+                        holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
+                        break;
+                    } else {
+                        checkBoxState[position] = false;
+                        holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
+                    }
+                    holder.fav.setChecked(checkBoxState[position]);
+                }
             }
-            holder.fav.setChecked(checkBoxState[position]);
-        }
-
-
-//
-//        holder.fav.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (((CheckBox) v).isChecked()) {
-//                    checkBoxState[position] = true;
-//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_unchecked_fav);
-//                    favSet.remove(data.get(position).getArtistName());
-//                } else {
-//                    checkBoxState[position] = false;
-//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_checked_fav);
-//                    favSet.add(data.get(position).getArtistName());
-//                }
-//                v.startAnimation(animation);
-//                v.refreshDrawableState();
-//                Log.d(TAG, "OnClickListener: " + favSet.size());
-//            }
-//        });
-//
+            catch (ConcurrentModificationException cme)
+            {
+                cme.printStackTrace();
+            }
 
             holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    checkBoxState[position] = true;
-                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
-                    favSet.add(data.get(position).getArtistName());
-                }
-                else {
-                    checkBoxState[position] = false;
-                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
-                    favSet.remove(data.get(position).getArtistName());
-                }
+                    if (!checkBoxState[position]) {
+                        checkBoxState[position] = true;
+                        buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
+                        favSet.add(data.get(position).getArtistName());
 
-                buttonView.startAnimation(animation);
+                    } else {
+                        checkBoxState[position] = false;
+                        buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
+                        favSet.remove(data.get(position).getArtistName());
+                    }
+
+                    buttonView.startAnimation(animation);
                     Log.i(TAG, "OnClickListener: " + favSet.size());
                 }
             });
-            Log.d(TAG, "onBindViewHolder:position " + position + " checkBoxState " + checkBoxState[position]);
 
+        Log.d(TAG, "onBindViewHolder:position " + position + " checkBoxState " + checkBoxState[position]);
 
-        final String finalGenres = genres;
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent artist = new Intent(activity, ArtistDescription.class);
-                artist.putExtra(Utils.KEY_ARTIST_NAME, item.getArtistName());
-                artist.putExtra(Utils.KEY_ARTIST_GENRES, finalGenres);
-                artist.putExtra(Utils.KEY_ARTIST_ALBUMS, albums);
-                artist.putExtra(Utils.KEY_ARTIST_TRACKS, tracks);
-                artist.putExtra(Utils.KEY_ARTIST_DESCRIPTION, item.getDescription());
-                artist.putExtra(Utils.KEY_ARTIST_LINK, item.getLink());
-                artist.putExtra(Utils.KEY_ARTIST_BIG_IMAGE, item.getImgUrl().get("big"));
-                activity.startActivity(artist);
-            }
-        });
+    final String finalGenres = genres;
+    holder.cardView.setOnClickListener(new View.OnClickListener()
 
+    {
+        @Override
+        public void onClick (View v){
+        Intent artist = new Intent(activity, ArtistDescription.class);
+        artist.putExtra(Utils.KEY_ARTIST_NAME, item.getArtistName());
+        artist.putExtra(Utils.KEY_ARTIST_GENRES, finalGenres);
+        artist.putExtra(Utils.KEY_ARTIST_ALBUMS, albums);
+        artist.putExtra(Utils.KEY_ARTIST_TRACKS, tracks);
+        artist.putExtra(Utils.KEY_ARTIST_DESCRIPTION, item.getDescription());
+        artist.putExtra(Utils.KEY_ARTIST_LINK, item.getLink());
+        artist.putExtra(Utils.KEY_ARTIST_BIG_IMAGE, item.getImgUrl().get("big"));
+        activity.startActivity(artist);
     }
+    }
+
+    );
+
+}
 
     @Override
     public int getItemCount() {

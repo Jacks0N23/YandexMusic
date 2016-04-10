@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
 import java.io.File;
@@ -50,32 +51,34 @@ public class FeedParser extends AsyncTask<URL, Void, Void> {
 
         @Override
     protected Void doInBackground(URL... params) {
-        try {
-            HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(30000);
-            conn.setUseCaches(true);
-            conn.setDefaultUseCaches(true);
-            enableHttpResponseCache();
+            if(AdapterMain.data.size() == 0) {
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) params[0].openConnection();
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(30000);
+                    conn.setUseCaches(true);
+                    conn.setDefaultUseCaches(true);
+                    enableHttpResponseCache();
 
-            InputStream input = conn.getInputStream();
-            JsonReader reader = new JsonReader(new InputStreamReader(input, "UTF-8"));
+                    InputStream input = conn.getInputStream();
+                    JsonReader reader = new JsonReader(new InputStreamReader(input, "UTF-8"));
 
-            reader.beginArray();
-            while (reader.hasNext()) {
-                    Artist message = new GsonBuilder().setLenient().create().fromJson(reader, Artist.class);
-                    mArtists.add(message);
-                    Log.d(TAG, "doInBackground: WAS HERE");
-                    Log.d(TAG, "doInBackground: " + message.getImgUrl().get("small"));
+                    reader.beginArray();
+                    while (reader.hasNext()) {
+                        Artist message = new GsonBuilder().setLenient().create().fromJson(reader, Artist.class);
+                        mArtists.add(message);
+                        Log.d(TAG, "doInBackground: WAS HERE");
+                        Log.d(TAG, "doInBackground: " + message.getImgUrl().get("small"));
+                    }
+
+                    reader.endArray();
+                    reader.close();
+
+
+                } catch (IOException | JsonSyntaxException jse) {
+                    jse.printStackTrace();
+                }
             }
-
-            reader.endArray();
-            reader.close();
-
-
-        } catch (IOException jse) {
-            jse.printStackTrace();
-        }
         return null;
     }
 
