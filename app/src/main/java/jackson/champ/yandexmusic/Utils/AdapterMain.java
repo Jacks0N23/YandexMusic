@@ -1,7 +1,6 @@
 package jackson.champ.yandexmusic.Utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.widget.CardView;
@@ -41,29 +40,24 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         AdapterMain.activity = activity;
         AdapterMain.data = data;
         this.animation = animation;
-        Log.d(TAG, "Constructor: data.size()  " + data.size());
 
         mDb = new Database(activity);
         mDb.open();
     }
 
     @Override
-    public AdapterMain.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public  AdapterMain.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card, parent, false);
 
-        sp = activity.getSharedPreferences("fav", Context.MODE_PRIVATE);
         checkBoxState = new boolean[data.size()];
         Log.e(TAG, "onCreateViewHolder: " + checkBoxState.length);
-
-
 
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final AdapterMain.ViewHolder holder, int position) {
-
+    public  void onBindViewHolder(final AdapterMain.ViewHolder holder, int position) {
 
         final Artist item = data.get(position);
 
@@ -85,38 +79,41 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         Log.d(TAG, "onBindViewHolder: position " + position);
 
 
-                if (mDb.isArtistFaved(item.getArtistName()))
-                {
-                    Log.e(TAG, "onBindViewHolder: " + item.getArtistName());
-                    checkBoxState[position] = true;
-                    Log.e(TAG, "onBindViewHolder: " + checkBoxState[position]);
-                    holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
+        if (mDb.isArtistFaved(item.getArtistName()))
+        {
+            Log.e(TAG, "onBindViewHolder: " + item.getArtistName());
+            checkBoxState[position] = true;
+            Log.e(TAG, "onBindViewHolder: " + checkBoxState[position]);
+            holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
+        }
+        else {
+            checkBoxState[position] = false;
+            holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
+            }
+            holder.fav.setChecked(checkBoxState[position]);
+
+//        holder.fav.setChecked(mDb.isArtistFaved(item.getArtistName()));
+
+        holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    checkBoxState[holder.getAdapterPosition()] = true;
+                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
+                    mDb.Fav(item.getArtistName(),(byte) 1);
+                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
+
+                } else {
+                    checkBoxState[holder.getAdapterPosition()] = false;
+                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
+                    mDb.Fav(item.getArtistName(), (byte) 0);
+                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 0");
                 }
-                else {
-                    checkBoxState[position] = false;
-                    holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
-                    }
-                    holder.fav.setChecked(checkBoxState[position]);
 
-
-            holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked && !checkBoxState[holder.getAdapterPosition()]) {
-                        checkBoxState[holder.getAdapterPosition()] = true;
-                        buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
-                        mDb.Fav(item.getArtistName(),(byte) 1);
-
-                    } else {
-                        checkBoxState[holder.getAdapterPosition()] = false;
-                        buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
-                        mDb.Fav(item.getArtistName(), (byte) 0);
-                    }
-
-                    buttonView.startAnimation(animation);
-                    Log.d(TAG, "onBindViewHolder: onCheckedChanged " + mDb.getArtistsCount());
-                }
-            });
+                buttonView.startAnimation(animation);
+                Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
+            }
+        });
 
         Log.d(TAG, "onBindViewHolder:position " + position + " checkBoxState " + checkBoxState[position]);
 
@@ -141,6 +138,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     );
 
 }
+
 
     @Override
     public int getItemCount() {

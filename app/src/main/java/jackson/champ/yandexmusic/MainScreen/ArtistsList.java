@@ -1,7 +1,6 @@
 package jackson.champ.yandexmusic.MainScreen;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import jackson.champ.yandexmusic.DB.Database;
 import jackson.champ.yandexmusic.R;
 import jackson.champ.yandexmusic.Utils.AdapterMain;
 import jackson.champ.yandexmusic.Utils.Artist;
@@ -34,6 +34,8 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     private AdapterMain adapter;
     Animation animation;
     private SharedPreferences sp;
+    boolean[] checkBoxState;
+    public static Database mDb;
 
 
     @Nullable
@@ -42,10 +44,13 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
 
         View ArtistsList = inflater.inflate(R.layout.artists_list, container, false);
 
+
+
         if (!Utils.isOnline(getActivity()))
             Utils.initInternetConnectionDialog(getActivity());
         else
         {
+
             mRecyclerView = (RecyclerView) ArtistsList.findViewById(R.id.feed_recycler_view);
 
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -54,12 +59,12 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
             LoadingData();
         }
 
-        sp = getActivity().getSharedPreferences("fav", Context.MODE_PRIVATE);
 
         return ArtistsList;
     }
 
     private void LoadingData()
+
     {
         animation = AnimationUtils.loadAnimation(getActivity(), R.anim.fav_checking);
 
@@ -83,18 +88,4 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onPause() {
-//        Log.d(TAG, "ArtistsList: " + AdapterMain.favSet);
-//        SharedPreferences.Editor ed = sp.edit();
-//        ed.clear();
-//        ed.putStringSet("favSet", AdapterMain.favSet);
-//        ed.apply();
-        super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 }
