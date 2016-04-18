@@ -25,7 +25,7 @@ public class FeedParser extends AsyncTask<URL, Void, Void> {
     private Activity activity;
     private List<Artist> mArtists = new ArrayList<>();
     private String TAG = "FeedParser";
-    public static int hash;
+
     OnTaskCompleted onTaskCompleted;
 
     public FeedParser(Activity activity, OnTaskCompleted onTaskCompleted, ArrayList<Artist> data) {

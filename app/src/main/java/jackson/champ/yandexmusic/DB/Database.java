@@ -12,7 +12,7 @@ import android.util.Log;
 public class Database {
     public static String DATABASE_NAME = "YandexMusic";
     public static String DATABASE_TABLE_MAIN = "Artists";
-    public static int DATABASE_VERSION = 2;
+    public static int DATABASE_VERSION = 1;
     public static String KEY_NAME = "artist";
     public static String KEY_FAV = "fav";
     public static String KEY_ROW_ID = "_id";
@@ -63,12 +63,15 @@ public class Database {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_NAME, artistName);
         initialValues.put(KEY_FAV, fav);
+        Log.e(TAG, "DataBase: artistName: " + artistName + " fav: " + fav);
         if (cursor.getCount() == 0){
+            Log.e(TAG, "DataBase:cursor.getCount() " + cursor.getCount());
             cursor.close();
             return mDb.insert(DATABASE_TABLE_MAIN, null, initialValues);
         }
         else {
             cursor.close();
+            Log.e(TAG, "DataBase: ELSE STATEMENT getCount() " + cursor.getCount());
             return mDb.update(DATABASE_TABLE_MAIN, initialValues, "artist = '"+artistName+"'", null);
         }
 
@@ -80,12 +83,13 @@ public class Database {
         Cursor c = mDb.rawQuery("select fav from Artists where artist = '"+artist+"'", null);
         if (c.moveToFirst()) {
             do {
-                isArtistFaved = c.getInt(c.getColumnIndex(KEY_FAV)) == 0;
+                isArtistFaved = c.getInt(c.getColumnIndex(KEY_FAV)) == 1;
+                 Log.d(TAG, "isArtistFaved: isArtistFaved c.getInt(c.getColumnIndex(KEY_FAV)) ==  " + c.getInt(c.getColumnIndex(KEY_FAV)));
                 Log.d(TAG, "isArtistFaved: isArtistFaved Changed to " + isArtistFaved);
             } while (c.moveToNext());
             c.close();
         }
-
+        close();
         return isArtistFaved;
     }
 
