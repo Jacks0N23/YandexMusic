@@ -17,8 +17,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     private final static String DATABASE_CREATE_MAIN =
             "CREATE TABLE if not exists " + Database.DATABASE_TABLE_MAIN +
-                    "(" + Database.KEY_ROW_ID + " integer primary key autoincrement, "
+                    "( " + Database.KEY_ROW_ID + " integer primary key autoincrement, "
                     + Database.KEY_NAME + " TEXT, "
+                    + Database.KEY_GENRES + " TEXT, "
+                    + Database.KEY_ALBUMS + " TEXT, "
+                    + Database.KEY_TRACKS + " TEXT, "
+                    + Database.KEY_DESCRIPTION + " TEXT, "
+                    + Database.KEY_LINK + " TEXT, "
+                    + Database.KEY_SMALL_COVER + " TEXT, "
+                    + Database.KEY_BIG_COVER + " TEXT, "
                     + Database.KEY_FAV + " INTEGER"
                     + ");";
 

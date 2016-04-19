@@ -2,7 +2,7 @@ package jackson.champ.yandexmusic.Utils;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
@@ -30,16 +32,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     public static ArrayList<Artist> data;
     private static Activity activity;
     Animation animation;
-    private SharedPreferences sp;
     // boolean array for storing
     boolean[] checkBoxState;
     public static Database mDb;
 
 
-    public AdapterMain(Activity activity, ArrayList<Artist> data, Animation animation) {
+    public AdapterMain(Activity activity, ArrayList<Artist> data) {
         AdapterMain.activity = activity;
         AdapterMain.data = data;
-        this.animation = animation;
 
         mDb = new Database(activity);
         mDb.open();
@@ -54,22 +54,41 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         checkBoxState = new boolean[data.size()];
         Log.e(TAG, "onCreateViewHolder: " + checkBoxState.length);
 
+        animation = AnimationUtils.loadAnimation(activity, R.anim.fav_checking);
+
         holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!checkBoxState[holder.getAdapterPosition()]) {
+                if ( !checkBoxState[holder.getAdapterPosition()]) {
                     checkBoxState[holder.getAdapterPosition()] = true;
                     buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
-                    mDb.Fav(holder.ArtistName.getText().toString(),(byte) 1);
+                    final int position = holder.getAdapterPosition();
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String artistName = holder.ArtistName.getText().toString();
+                            final String genres = holder.ArtistGenre.getText().toString();
+                            final String albums = holder.ArtistAlbums.getText().toString();
+                            final String tracks = holder.ArtistTracks.getText().toString();
+                            final String description = data.get(position).getDescription();
+                            final String link = data.get(position).getLink();
+                            final String smallCover = data.get(position).getImgUrl().get("small");
+                            final String bigCover = data.get(position).getImgUrl().get("big");
+                            mDb.Fav(artistName, genres, albums,tracks,description,link,smallCover,bigCover,(byte) 1);
+                        }
+                    });
                     Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
 
                 } else {
                     checkBoxState[holder.getAdapterPosition()] = false;
                     buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
-                    mDb.Fav(holder.ArtistName.getText().toString(), (byte) 0);
-                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 0");
+                    /**
+                     * можно было бы не удалять, а менять только значение fav, тем самым было бы меньше операций записи,
+                     * но, т.к это тестовое приложение, я думаю это не столь важно
+                     */
+                    mDb.deleteArtist(holder.ArtistName.getText().toString());
+                    Log.d(TAG, "onBindViewHolder: onCheckedChanged artist deleted");
                 }
-
                 buttonView.startAnimation(animation);
                 Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
             }
@@ -95,7 +114,10 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         holder.ArtistAlbums.setText(albums);
         holder.ArtistTracks.setText(tracks);
 
-        Glide.with(activity).load(item.getImgUrl().get("small")).into(holder.ArtistImage);
+        Glide.with(activity)
+                .load(item.getImgUrl().get("small"))
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .into(holder.ArtistImage);
 
         Log.d(TAG, "onBindViewHolder: position " + position);
 
@@ -111,46 +133,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             checkBoxState[position] = false;
             holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
             }
-
-
-//        holder.fav.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(((CheckBox)v).isChecked()) {
-//                    checkBoxState[holder.getAdapterPosition()] = true;
-//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_checked_fav);
-//                    mDb.Fav(item.getArtistName(),(byte) 1);
-//                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
-//                }
-//                else {
-//                    checkBoxState[holder.getAdapterPosition()] = false;
-//                    ((CheckBox) v).setButtonDrawable(R.drawable.ic_unchecked_fav);
-//                    mDb.Fav(item.getArtistName(), (byte) 0);
-//                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 0");
-//                }
-//            }
-//        });
-
-//        holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (isChecked) {
-//                    checkBoxState[holder.getAdapterPosition()] = true;
-//                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
-//                    mDb.Fav(item.getArtistName(),(byte) 1);
-//                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
-//
-//                } else {
-//                    checkBoxState[holder.getAdapterPosition()] = false;
-//                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
-//                    mDb.Fav(item.getArtistName(), (byte) 0);
-//                    Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 0");
-//                }
-//
-//                buttonView.startAnimation(animation);
-//                Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
-//            }
-//        });
 
         Log.d(TAG, "onBindViewHolder:position " + position + " checkBoxState " + checkBoxState[position]);
 
@@ -173,7 +155,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     );
-        holder.cardView.refreshDrawableState();
 
 }
 
@@ -199,7 +180,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             cardView = (CardView) holderView.findViewById(R.id.card_view);
             ArtistImage = (ImageView) holderView.findViewById(R.id.artist_image);
             ArtistName = (TextView) holderView.findViewById(R.id.artist_name);
-            ArtistGenre = (TextView) holderView.findViewById(R.id.genre);
+            ArtistGenre = (TextView) holderView.findViewById(R.id.genres);
             ArtistAlbums = (TextView) holderView.findViewById(R.id.artist_albums);
             ArtistTracks = (TextView) holderView.findViewById(R.id.artist_tracks);
         }

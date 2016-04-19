@@ -63,7 +63,7 @@
                 android:layout_marginBottom="-10dp" />
 
             <TextView
-                android:id="@+id/genre"
+                android:id="@+id/genres"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:background="?android:attr/colorBackground"
