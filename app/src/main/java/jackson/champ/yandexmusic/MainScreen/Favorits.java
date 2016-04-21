@@ -17,10 +17,8 @@ import jackson.champ.yandexmusic.DB.SimpleCursorRecyclerAdapter;
 import jackson.champ.yandexmusic.R;
 import jackson.champ.yandexmusic.Utils.OnTaskCompleted;
 
-/**
- * Created by jackson on 29.03.16.
- */
-public class Favorives extends android.support.v4.app.Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor>, OnTaskCompleted{
+
+public class Favorits extends android.support.v4.app.Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor>, OnTaskCompleted{
 
     private static final String TAG = "Favorives" ;
     private RecyclerView mRecyclerView;
@@ -40,6 +38,7 @@ public class Favorives extends android.support.v4.app.Fragment implements androi
         getActivity().getLoaderManager().initLoader(LOADER_ID,null, this);
 
         swipeRefreshLayout = (SwipeRefreshLayout)ArtistsFav.findViewById(R.id.refresher);
+        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -72,7 +71,7 @@ public class Favorives extends android.support.v4.app.Fragment implements androi
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        recyclerAdapter.changeCursor(data);
+        recyclerAdapter.swapCursor(data);
 
     }
 
@@ -83,6 +82,6 @@ public class Favorives extends android.support.v4.app.Fragment implements androi
 
     @Override
     public void onTaskCompleted() {
-        getActivity().getLoaderManager().getLoader(LOADER_ID).onContentChanged();
+        getActivity().getLoaderManager().getLoader(LOADER_ID).forceLoad();
     }
 }

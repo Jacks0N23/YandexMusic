@@ -35,11 +35,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     // boolean array for storing
     boolean[] checkBoxState;
     public static Database mDb;
+    private OnTaskCompleted onTaskCompleted;
 
-
-    public AdapterMain(Activity activity, ArrayList<Artist> data) {
+    public AdapterMain(Activity activity, ArrayList<Artist> data, OnTaskCompleted onTaskCompleted) {
         AdapterMain.activity = activity;
         AdapterMain.data = data;
+        this.onTaskCompleted = onTaskCompleted;
 
         mDb = new Database(activity);
         mDb.open();
@@ -58,10 +59,10 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
         holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if ( !checkBoxState[holder.getAdapterPosition()]) {
+            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
+                if (!mDb.isArtistFaved(holder.ArtistName.getText().toString())) {
                     checkBoxState[holder.getAdapterPosition()] = true;
-                    buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
+
                     final int position = holder.getAdapterPosition();
                     new Handler().post(new Runnable() {
                         @Override
@@ -77,19 +78,36 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                             mDb.Fav(artistName, genres, albums,tracks,description,link,smallCover,bigCover,(byte) 1);
                         }
                     });
+
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            buttonView.startAnimation(animation);
+                            buttonView.setButtonDrawable(R.drawable.ic_checked_fav);
+                        }
+                    });
                     Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
 
                 } else {
                     checkBoxState[holder.getAdapterPosition()] = false;
-                    buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
+
                     /**
                      * можно было бы не удалять, а менять только значение fav, тем самым было бы меньше операций записи,
                      * но, т.к это тестовое приложение, я думаю это не столь важно
                      */
                     mDb.deleteArtist(holder.ArtistName.getText().toString());
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            buttonView.startAnimation(animation);
+                            buttonView.setButtonDrawable(R.drawable.ic_unchecked_fav);
+                        }
+                    });
                     Log.d(TAG, "onBindViewHolder: onCheckedChanged artist deleted");
                 }
-                buttonView.startAnimation(animation);
+
+                bindViewHolder(holder, holder.getAdapterPosition());
+                onTaskCompleted.onTaskCompleted();
                 Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
             }
         });

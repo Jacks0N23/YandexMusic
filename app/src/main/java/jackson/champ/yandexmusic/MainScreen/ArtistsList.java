@@ -28,7 +28,7 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     String url = "http://download.cdn.yandex.net/mobilization-2016/artists.json";
     public static ArrayList<Artist> sArtists = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private AdapterMain adapter;
+    public static AdapterMain adapter;
     public static SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
@@ -44,11 +44,14 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
         else
         {
             swipeRefreshLayout = (SwipeRefreshLayout)ArtistsList.findViewById(R.id.refresher);
+            swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
+
+                    LoadingData();
                     onTaskCompleted();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 }
             });
             mRecyclerView = (RecyclerView) ArtistsList.findViewById(R.id.feed_recycler_view);
@@ -64,9 +67,9 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
     }
 
     private void LoadingData()
-
     {
-        adapter = new AdapterMain(getActivity(), sArtists);
+        swipeRefreshLayout.setRefreshing(true);
+        adapter = new AdapterMain(getActivity(), sArtists, this);
         mRecyclerView.setAdapter(adapter);
         try {
 
@@ -77,13 +80,21 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
             e.printStackTrace();
 
             Toast.makeText(getActivity(), getString(R.string.conn_problems),Toast.LENGTH_LONG).show();
-
         }
+
     }
 
     @Override
     public synchronized void onTaskCompleted() {
+
         adapter.notifyDataSetChanged();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().getLoaderManager().getLoader(Favorits.LOADER_ID).forceLoad();
+            }
+        }).start();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 }

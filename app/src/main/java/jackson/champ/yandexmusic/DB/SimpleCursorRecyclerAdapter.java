@@ -70,19 +70,6 @@ public class SimpleCursorRecyclerAdapter extends CursorRecyclerAdapter<SimpleCur
             }
         });
 
-//        holder.fav.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//
-//                checkBoxState[holder.getAdapterPosition()] = false;
-//
-//                mDb.deleteArtist(holder.ArtistName.getText().toString());
-//                Log.d(TAG, "onBindViewHolder: onCheckedChanged artist deleted");
-//                Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
-//                onTaskCompleted.onTaskCompleted();
-//            }
-//        });
-
         return holder;
     }
 

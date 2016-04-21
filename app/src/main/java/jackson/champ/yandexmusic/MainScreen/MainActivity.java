@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     return new ArtistsList();
                 case 1:
-                    return new Favorives();
+                    return new Favorits();
             }
         }
 

@@ -80,11 +80,11 @@ public class Database {
         Log.e(TAG, "DataBase: artistName: " + artistName + " fav: " + fav);
         if (cursor.getCount() == 0){
             Log.e(TAG, "DataBase:cursor.getCount() " + cursor.getCount());
-            cursor.close();
+            closeCursor(cursor);
             return mDb.insert(DATABASE_TABLE_MAIN, null, initialValues);
         }
         else {
-            cursor.close();
+            closeCursor(cursor);
             Log.e(TAG, "DataBase: ELSE STATEMENT getCount() " + cursor.getCount());
             return mDb.update(DATABASE_TABLE_MAIN, initialValues, "artist = '"+artistName+"'", null);
         }
@@ -94,19 +94,26 @@ public class Database {
     public boolean isArtistFaved(String artist) {
         boolean isArtistFaved = false;
         mDb = mDbHelper.getReadableDatabase();
-        Cursor c = mDb.rawQuery("select fav from Artists where artist = '"+artist+"'", null);
-        if (c.moveToFirst()) {
+        Cursor cursor = mDb.rawQuery("select fav from Artists where artist = '"+artist+"'", null);
+        if (cursor.moveToFirst()) {
             do {
-                isArtistFaved = c.getInt(c.getColumnIndex(KEY_FAV)) == 1;
-                 Log.d(TAG, "isArtistFaved: isArtistFaved c.getInt(c.getColumnIndex(KEY_FAV)) ==  " + c.getInt(c.getColumnIndex(KEY_FAV)));
+                isArtistFaved = cursor.getInt(cursor.getColumnIndex(KEY_FAV)) == 1;
+                 Log.d(TAG, "isArtistFaved: isArtistFaved cursor.getInt(cursor.getColumnIndex(KEY_FAV)) ==  " + cursor.getInt(cursor.getColumnIndex(KEY_FAV)));
                 Log.d(TAG, "isArtistFaved: isArtistFaved Changed to " + isArtistFaved);
-            } while (c.moveToNext());
-            c.close();
+            } while (cursor.moveToNext());
+            closeCursor(cursor);
         }
-        close();
         return isArtistFaved;
     }
 
+    void closeCursor(Cursor cursor)
+    {
+        if(cursor != null && !cursor.isClosed()){
+            cursor.close();
+        }
+        else
+            Log.e(TAG, "closeCursor: can't close CURSOR");
+    }
     /**
      * Delete artist
      *
@@ -131,19 +138,9 @@ public class Database {
         return true;
     }
 
-
-
-    public Cursor getFavArtists(String artist) {
-        String[] all_colomns = new String[]{KEY_FAV};
-        String selection = KEY_NAME + " = "+ artist ;
-        return mDb.query(true, DATABASE_TABLE_MAIN, all_colomns ,selection , null,
-                null, null, null, null);
-    }
-
     public Cursor getAllArtists() {
         String[] all_colomns = new String[]{KEY_ROW_ID,KEY_NAME, KEY_GENRES,KEY_ALBUMS,KEY_TRACKS,KEY_SMALL_COVER, KEY_DESCRIPTION, KEY_LINK, KEY_BIG_COVER};
         return mDb.query(true, DATABASE_TABLE_MAIN, all_colomns ,null , null,
-                null, null, null, null);
+                null, null, KEY_NAME + " ASC", null);
     }
-
 }
