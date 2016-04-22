@@ -33,7 +33,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     private static Activity activity;
     Animation animation;
     // boolean array for storing
-    boolean[] checkBoxState;
     public static Database mDb;
     private OnTaskCompleted onTaskCompleted;
 
@@ -52,8 +51,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 .inflate(R.layout.card, parent, false);
 
         final ViewHolder holder = new ViewHolder(v);
-        checkBoxState = new boolean[data.size()];
-        Log.e(TAG, "onCreateViewHolder: " + checkBoxState.length);
 
         animation = AnimationUtils.loadAnimation(activity, R.anim.fav_checking);
 
@@ -61,7 +58,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked) {
                 if (!mDb.isArtistFaved(holder.ArtistName.getText().toString())) {
-                    checkBoxState[holder.getAdapterPosition()] = true;
 
                     final int position = holder.getAdapterPosition();
                     new Handler().post(new Runnable() {
@@ -89,8 +85,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     Log.d(TAG, "onBindViewHolder: onCheckedChanged в mDb.fav добавлено 1");
 
                 } else {
-                    checkBoxState[holder.getAdapterPosition()] = false;
-
                     /**
                      * можно было бы не удалять, а менять только значение fav, тем самым было бы меньше операций записи,
                      * но, т.к это тестовое приложение, я думаю это не столь важно
@@ -143,16 +137,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         if (mDb.isArtistFaved(item.getArtistName()))
         {
             Log.e(TAG, "onBindViewHolder: " + item.getArtistName());
-            checkBoxState[position] = true;
-            Log.e(TAG, "onBindViewHolder: " + checkBoxState[position]);
             holder.fav.setButtonDrawable(R.drawable.ic_checked_fav);
         }
         else {
-            checkBoxState[position] = false;
             holder.fav.setButtonDrawable(R.drawable.ic_unchecked_fav);
             }
 
-        Log.d(TAG, "onBindViewHolder:position " + position + " checkBoxState " + checkBoxState[position]);
+        Log.d(TAG, "onBindViewHolder:position " + position);
 
     final String finalGenres = genres;
     holder.cardView.setOnClickListener(new View.OnClickListener()

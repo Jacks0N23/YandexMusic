@@ -26,6 +26,11 @@
             app:titleTextColor="?android:attr/colorBackground"
             app:layout_scrollFlags="scroll|enterAlways">
 
+            <EditText
+                android:id="@+id/searchEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
         </android.support.v7.widget.Toolbar>
 
         <android.support.design.widget.TabLayout

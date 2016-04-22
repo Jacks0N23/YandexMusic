@@ -31,6 +31,34 @@ public class Artist {
         return mArtistName;
     }
 
+    public void setmArtistName(String mArtistName) {
+        this.mArtistName = mArtistName;
+    }
+
+    public void setmGenre(List<String> mGenre) {
+        this.mGenre = mGenre;
+    }
+
+    public void setmArtistAlbums(String mArtistAlbums) {
+        this.mArtistAlbums = mArtistAlbums;
+    }
+
+    public void setmArtistTracks(String mArtistTracks) {
+        this.mArtistTracks = mArtistTracks;
+    }
+
+    public void setmLink(String mLink) {
+        this.mLink = mLink;
+    }
+
+    public void setmArtistImage(Map<String, String> mArtistImage) {
+        this.mArtistImage = mArtistImage;
+    }
+
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
+    }
+
     public List<String> getGenre() {
         return mGenre;
     }

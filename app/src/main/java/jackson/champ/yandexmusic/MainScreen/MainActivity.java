@@ -1,5 +1,6 @@
 package jackson.champ.yandexmusic.MainScreen;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import jackson.champ.yandexmusic.R;
 
@@ -29,11 +33,16 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    TabLayout tabLayout;
+
+    public static EditText searchEditText;
+    InputMethodManager imm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,10 +55,12 @@ public class MainActivity extends AppCompatActivity {
         assert mViewPager != null;
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         assert tabLayout != null;
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        searchEditText = (EditText)findViewById(R.id.searchEditText);
     }
 
 
@@ -68,14 +79,29 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.search:
+                searchEditText.setVisibility(View.VISIBLE);
+                searchEditText.requestFocus();
+                imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new Search()).commit();
+
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (searchEditText.getVisibility() == View.VISIBLE) {
+            searchEditText.setVisibility(View.GONE);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            tabLayout.setupWithViewPager(mViewPager);
+        }
+        else
+            super.onBackPressed();
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

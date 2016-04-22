@@ -12,7 +12,7 @@ import android.util.Log;
 public class Database {
     public static String DATABASE_NAME = "YandexMusic";
     public static String DATABASE_TABLE_MAIN = "Artists";
-    public static int DATABASE_VERSION = 2;
+    public static int DATABASE_VERSION = 1;
     public static String KEY_NAME = "artist";
     public static String KEY_FAV = "fav";
     public static String KEY_ROW_ID = "_id";
