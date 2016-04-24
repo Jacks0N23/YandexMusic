@@ -13,6 +13,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorBackground">@color/cardview_light_background</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
+
     </style>
 
 </resources>
