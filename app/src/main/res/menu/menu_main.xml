@@ -2,9 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainScreen.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/unlike_all"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/action_unlike_all"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_unchecked_fav" />
 </menu>

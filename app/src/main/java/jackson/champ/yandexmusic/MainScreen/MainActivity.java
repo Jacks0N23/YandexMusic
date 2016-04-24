@@ -1,5 +1,8 @@
 package jackson.champ.yandexmusic.MainScreen;
 
+import android.content.Context;
+import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,7 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 
+import jackson.champ.yandexmusic.DB.Database;
 import jackson.champ.yandexmusic.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,11 +34,19 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    TabLayout tabLayout;
+
+    InputMethodManager imm;
+    private Database mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        mDb = new Database(this);
+        mDb.open();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,10 +59,11 @@ public class MainActivity extends AppCompatActivity {
         assert mViewPager != null;
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        assert mViewPager != null;
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        assert tabLayout != null;
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
     }
 
 
@@ -67,15 +81,29 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        /**
+         * По клику на кнопке поиска переводим фокус на неё,
+         * показываем клавиатуру и ставим layout для вывода нужного артиста
+         **/
+        switch (id) {
+            case R.id.unlike_all:
+                try {
+                    mDb.deleteAll();
+                } catch (SQLException sqle)
+                {
+                    sqle.printStackTrace();
+                    finish();
+                    startActivity(new Intent(this, MainActivity.class));
+                }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        mDb.close();
+        super.onDestroy();
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -94,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     return new ArtistsList();
                 case 1:
-                    return new Favorives();
+                    return new Favorites();
             }
         }
 

@@ -7,13 +7,12 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground"
     android:fitsSystemWindows="true"
-    tools:context=".Elements.Article.ArticleActivity">
+    tools:context=".ArtistScreen.ArtistDescription">
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/article_background_NSV"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_vertical"
+            android:layout_height="wrap_content"
             android:fadeScrollbars="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_below="@+id/appbar_article"
@@ -24,7 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?android:attr/colorBackground"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="60dp">
 
                 <TextView
                     android:id="@+id/genres"
@@ -33,7 +33,7 @@
                     android:layout_marginBottom="16dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="16dp"
                     android:textColor="?android:attr/textColorTertiary"
                     android:textSize="16sp"
                     android:hint="genres" />
@@ -80,29 +80,30 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/artist_description"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    android:textColor="?android:attr/textColorPrimary"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/artist_link"
-                    android:layout_marginLeft="8dp" />
+                    android:autoLink="web"
+                    android:linksClickable="true"
+                    android:layout_marginLeft="8dp"
+                    android:textColor="?android:attr/textColorPrimary" />
 
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_article"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:fitsSystemWindows="true">
+        android:layout_height="350dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -120,16 +121,25 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.7"
                     android:layout_below="@+id/toolbar"
-                    android:scaleType="centerCrop" />
-
+                    android:adjustViewBounds="true"/>
+                <ProgressBar
+                    android:id="@+id/img_progressBar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="visible"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_below="@+id/toolbar" />
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true" />
+                    app:titleTextColor="?android:attr/colorBackground" />
             </RelativeLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
