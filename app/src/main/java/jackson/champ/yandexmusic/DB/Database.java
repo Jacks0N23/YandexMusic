@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 
-
 public class Database {
     public static String DATABASE_NAME = "YandexMusic";
     public static String DATABASE_TABLE_MAIN = "Artists";
@@ -79,13 +78,11 @@ public class Database {
         initialValues.put(KEY_BIG_COVER, bigCover);
         Log.e(TAG, "DataBase: artistName: " + artistName + " fav: " + fav);
         if (cursor.getCount() == 0){
-            Log.e(TAG, "DataBase:cursor.getCount() " + cursor.getCount());
             closeCursor(cursor);
             return mDb.insert(DATABASE_TABLE_MAIN, null, initialValues);
         }
         else {
             closeCursor(cursor);
-            Log.e(TAG, "DataBase: ELSE STATEMENT getCount() " + cursor.getCount());
             return mDb.update(DATABASE_TABLE_MAIN, initialValues, "artist = '"+artistName+"'", null);
         }
 
@@ -124,7 +121,6 @@ public class Database {
         mDb.delete(DATABASE_TABLE_MAIN, "artist = '"+artistName+"'", null);
         return true;
     }
-
 
     /**
      * Delete all rows

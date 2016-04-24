@@ -2,11 +2,11 @@ package jackson.champ.yandexmusic.MainScreen;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,21 +38,26 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
 
         View ArtistsList = inflater.inflate(R.layout.artists_list, container, false);
 
-
-
+        /**
+         * проверяем есть ли вообще соединение с интернетом, если есть - грузим данные, если нет - выводи диалог
+         */
         if (!Utils.isOnline(getActivity()))
             Utils.initInternetConnectionDialog(getActivity());
         else
         {
-            swipeRefreshLayout = (SwipeRefreshLayout)ArtistsList.findViewById(R.id.refresher);
+            swipeRefreshLayout = (SwipeRefreshLayout)ArtistsList.findViewById(R.id.refresher_list);
             swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-
                     LoadingData();
                     onTaskCompleted();
-
+                }
+            });
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
                 }
             });
             mRecyclerView = (RecyclerView) ArtistsList.findViewById(R.id.feed_recycler_view);
@@ -69,12 +74,12 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
 
     private void LoadingData()
     {
-        swipeRefreshLayout.setRefreshing(true);
+
         adapter = new AdapterMain(getActivity(), sArtists, this);
         mRecyclerView.setAdapter(adapter);
         try {
 
-            new FeedParser(getActivity(), this, sArtists).execute(new URL(url));
+            new FeedParser(getActivity(), this, sArtists,swipeRefreshLayout).execute(new URL(url));
 
         } catch (IOException e) {
 
@@ -82,9 +87,13 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
 
             Toast.makeText(getActivity(), getString(R.string.conn_problems),Toast.LENGTH_LONG).show();
         }
-
+        swipeRefreshLayout.setRefreshing(false);
     }
 
+    /**
+     * когда загрузка данных завершина, то вызывается этот метод и адаптер оповещает, что данные в нём изменились
+     * данные из Favorites так же обновляются
+     */
     @Override
     public synchronized void onTaskCompleted() {
 
@@ -92,16 +101,21 @@ public class ArtistsList extends android.support.v4.app.Fragment implements OnTa
         new Thread(new Runnable() {
             @Override
             public void run() {
-                getActivity().getLoaderManager().getLoader(Favorits.LOADER_ID).forceLoad();
+                getActivity().getLoaderManager().getLoader(Favorites.LOADER_ID).forceLoad();
             }
         }).start();
-        swipeRefreshLayout.setRefreshing(false);
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
-
     @Override
-    public void onPause() {
-        Log.e(TAG, "onPause: sArtists.size() " + sArtists.size());
-        super.onPause();
+    public void onDestroy() {
+        AdapterMain.mDb.close();
+        super.onDestroy();
     }
 }

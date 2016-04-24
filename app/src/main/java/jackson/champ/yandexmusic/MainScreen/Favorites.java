@@ -2,8 +2,6 @@ package jackson.champ.yandexmusic.MainScreen;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,34 +16,26 @@ import jackson.champ.yandexmusic.R;
 import jackson.champ.yandexmusic.Utils.OnTaskCompleted;
 
 
-public class Favorits extends android.support.v4.app.Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor>, OnTaskCompleted{
+public class Favorites extends android.support.v4.app.Fragment implements android.app.LoaderManager.LoaderCallbacks<Cursor>, OnTaskCompleted{
 
     private static final String TAG = "Favorives" ;
     private RecyclerView mRecyclerView;
     public static SimpleCursorRecyclerAdapter recyclerAdapter;
     public static final int LOADER_ID = 1;
     public Database mDb;
-    public static SwipeRefreshLayout swipeRefreshLayout;
 
-
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View ArtistsFav = inflater.inflate(R.layout.artists_fav, container, false);
-        Log.d(TAG, "onCreateView: In onCreateView  Favorives");
+        Log.d(TAG, "onCreateView: In onCreateView  Favorites");
         mDb = new Database(getActivity());
         mDb.open();
+
+        /**
+         * Создаём LoaderManager
+         */
         getActivity().getLoaderManager().initLoader(LOADER_ID,null, this);
 
-        swipeRefreshLayout = (SwipeRefreshLayout)ArtistsFav.findViewById(R.id.refresher);
-        swipeRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                onTaskCompleted();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
         mRecyclerView = (RecyclerView) ArtistsFav.findViewById(R.id.favedArtists);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
@@ -56,6 +46,10 @@ public class Favorits extends android.support.v4.app.Fragment implements android
     public void loadingDataFromDB()
     {
 
+        /**
+         * from - из каких колоннок БД мы забираем данные
+         * to  -  в какие места карточки их отправляем
+         */
         String[] from = new String[] {Database.KEY_NAME, Database.KEY_GENRES, Database.KEY_ALBUMS, Database.KEY_TRACKS, Database.KEY_SMALL_COVER};
         int[] to = new int[] {R.id.artist_name,R.id.genres, R.id.artist_albums, R.id.artist_tracks, R.id.artist_image};
 
@@ -82,6 +76,13 @@ public class Favorits extends android.support.v4.app.Fragment implements android
 
     @Override
     public void onTaskCompleted() {
+        ArtistsList.adapter.notifyDataSetChanged();
         getActivity().getLoaderManager().getLoader(LOADER_ID).forceLoad();
+    }
+
+    @Override
+    public void onDestroy() {
+        mDb.close();
+        super.onDestroy();
     }
 }

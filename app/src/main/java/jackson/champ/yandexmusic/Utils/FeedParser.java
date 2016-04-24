@@ -2,6 +2,7 @@ package jackson.champ.yandexmusic.Utils;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.google.gson.GsonBuilder;
@@ -25,13 +26,15 @@ public class FeedParser extends AsyncTask<URL, Void, Void> {
     private Activity activity;
     private List<Artist> mArtists = new ArrayList<>();
     private String TAG = "FeedParser";
-
+    SwipeRefreshLayout swipeRefreshLayout;
     OnTaskCompleted onTaskCompleted;
 
-    public FeedParser(Activity activity, OnTaskCompleted onTaskCompleted, ArrayList<Artist> data) {
+    public FeedParser(Activity activity, OnTaskCompleted onTaskCompleted, ArrayList<Artist> data, SwipeRefreshLayout swipeRefreshLayout) {
         this.activity = activity;
         this.mArtists = data;
         this.onTaskCompleted = onTaskCompleted;
+        this.swipeRefreshLayout = swipeRefreshLayout;
+
     }
 
     private void enableHttpResponseCache() {
@@ -48,8 +51,7 @@ public class FeedParser extends AsyncTask<URL, Void, Void> {
         }
     }
 
-
-        @Override
+    @Override
     protected Void doInBackground(URL... params) {
             if(AdapterMain.data.size() == 0) {
                 try {

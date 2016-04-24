@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import jackson.champ.yandexmusic.ArtistSreen.ArtistDescription;
+import jackson.champ.yandexmusic.ArtistScreen.ArtistDescription;
 import jackson.champ.yandexmusic.R;
 import jackson.champ.yandexmusic.Utils.OnTaskCompleted;
 import jackson.champ.yandexmusic.Utils.Utils;

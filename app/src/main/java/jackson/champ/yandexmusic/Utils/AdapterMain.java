@@ -21,7 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
-import jackson.champ.yandexmusic.ArtistSreen.ArtistDescription;
+import jackson.champ.yandexmusic.ArtistScreen.ArtistDescription;
 import jackson.champ.yandexmusic.DB.Database;
 import jackson.champ.yandexmusic.R;
 
@@ -100,7 +100,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     Log.d(TAG, "onBindViewHolder: onCheckedChanged artist deleted");
                 }
 
-                bindViewHolder(holder, holder.getAdapterPosition());
                 onTaskCompleted.onTaskCompleted();
                 Log.d(TAG, "onBindViewHolder: onCheckedChanged CLICKED");
             }

@@ -2,12 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainScreen.MainActivity">
-    <item
-        android:id="@+id/search"
-        android:orderInCategory="100"
-        android:title="@string/action_search"
-        app:showAsAction="always"
-        android:icon="@android:drawable/ic_menu_search" />
+
     <item
         android:id="@+id/unlike_all"
         android:orderInCategory="100"
